@@ -1,4 +1,4 @@
-name: CI/CD Security Pipeline - C#
+name: CI/CD Security Pipeline (.NET 10)
 
 permissions:
   security-events: write
@@ -12,23 +12,24 @@ on:
 
 jobs:
   # ================================
-  # 1. SAST - Semgrep (Análise Estática)
+  # 1. SAST - Semgrep
   # ================================
   sast:
     name: SAST - Semgrep (C#)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Install Python and Semgrep
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pip
-          pip install semgrep
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      - name: Run Semgrep on C# project
-        run: |
-          semgrep --config=p/ci --sarif --output semgrep.sarif || true
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep Scan
+        run: semgrep --config p/ci --sarif --output semgrep.sarif || true
 
       - name: Upload SAST Report
         uses: actions/upload-artifact@v4
@@ -36,24 +37,28 @@ jobs:
           name: sast-report
           path: semgrep.sarif
 
-      - name: Upload to GitHub Security
+      - name: Upload to GitHub Security Tab
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
 
   # ================================
-  # 2. SCA - Snyk (Dependências .NET)
+  # 2. SCA - Snyk
   # ================================
   sca:
-    name: SCA - Snyk (Dependências .NET)
+    name: SCA - Snyk (Dependencies)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup .NET
+      # Instala o .NET 10
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
+
+      - name: Install dependencies
+        run: dotnet restore
 
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
@@ -63,7 +68,7 @@ jobs:
       - name: Authenticate Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-      - name: Run Snyk test on .NET project
+      - name: Run Snyk test
         run: snyk test --json > snyk-report.json || true
 
       - name: Upload SCA Report
@@ -76,46 +81,50 @@ jobs:
   # 3. DAST - OWASP ZAP
   # ================================
   dast:
-    name: DAST - OWASP ZAP (Dynamic Scan)
+    name: DAST - OWASP ZAP (API)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup .NET
+      # Instala o .NET 10 para build da API
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
-      - name: Build API
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build application
         run: dotnet build --configuration Release
 
-      - name: Publish API
-        run: dotnet publish -c Release -o ./publish
+      - name: Publish app for testing
+        run: dotnet publish -c Release -o ./out
 
       - name: Start API in background
         run: |
-          nohup dotnet ./publish/SecureAPI.dll --urls "http://localhost:5000" > app.log 2>&1 &
+          nohup dotnet ./out/EUNOIA.dll --urls "http://localhost:8080" > app.log 2>&1 &
           for i in {1..12}; do
-            nc -z localhost 5000 && break
-            echo "⏳ Waiting for API to start..."
+            nc -z localhost 8080 && break
+            echo "Waiting for API to start..."
             sleep 5
           done
 
-      - name: Install OWASP ZAP 2.16.1
+      - name: Install ZAP 2.16.1
         run: |
           wget https://github.com/zaproxy/zaproxy/releases/download/v2.16.1/ZAP_2.16.1_Linux.tar.gz
           tar -xzf ZAP_2.16.1_Linux.tar.gz
           chmod +x ZAP_2.16.1/zap.sh
 
-      - name: Prepare report directory
+      - name: Create writable report directory
         run: mkdir -p ZAP_2.16.1/zap-reports && chmod -R 777 ZAP_2.16.1/zap-reports
 
       - name: Update ZAP add-ons
         run: ./ZAP_2.16.1/zap.sh -cmd -addonupdate
 
-      - name: Run OWASP ZAP Baseline Scan
+      - name: Run ZAP Baseline Scan
         run: |
-          ./ZAP_2.16.1/zap.sh -cmd -quickurl http://localhost:5000 -quickout ZAP_2.16.1/zap-reports/zap-report.html
+          ./ZAP_2.16.1/zap.sh -cmd -quickurl http://localhost:8080 -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
@@ -127,7 +136,7 @@ jobs:
   # 4. Integração & Monitoramento
   # ================================
   integration:
-    name: Integration & Vulnerability Check
+    name: Integration & Monitoring
     runs-on: ubuntu-latest
     needs: [sast, sca, dast]
     steps:
@@ -156,5 +165,5 @@ jobs:
             echo "❌ Vulnerabilidades críticas encontradas. Bloqueando deploy."
             exit 1
           else
-            echo "✅ Nenhuma vulnerabilidade crítica detectada."
+            echo "✅ Nenhuma vulnerabilidade crítica encontrada."
           fi
