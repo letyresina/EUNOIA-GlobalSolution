@@ -1,5 +1,6 @@
 ﻿using EUNOIA.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EUNOIA.Models
 {
@@ -11,7 +12,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id da empresa.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CompanyId { get; set; }
 
         /// <summary>

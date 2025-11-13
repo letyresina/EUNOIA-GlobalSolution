@@ -1,6 +1,8 @@
 using EUNOIA.Data;
+using EUNOIA.Repositories;
+using EUNOIA.Services;
 using Microsoft.EntityFrameworkCore;
-
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,8 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EunoiaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EunoiaConnection")));
 
-// Add Controllers
-builder.Services.AddControllers();
+// Injeção de dependência para Company
+builder.Services.AddScoped<CompanyRepository>();
+builder.Services.AddScoped<CompanyService>();
+
+// Controllers + Configuração para enums como texto
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Swagger (documentação)
 builder.Services.AddEndpointsApiExplorer();
@@ -17,7 +27,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configuração do pipeline HTTP
+// Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
