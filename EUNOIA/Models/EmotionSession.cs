@@ -1,4 +1,5 @@
 ﻿using EUNOIA.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -38,6 +39,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Nível de confiança do modelo
         /// </summary>
+        [Precision(5, 2)]
         public decimal ConfidenceScore { get; set; }
 
         /// <summary>
