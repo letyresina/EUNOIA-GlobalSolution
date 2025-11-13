@@ -11,7 +11,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id das configurações.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SettingId { get; set; }
 
         // Chave estrangeira para User

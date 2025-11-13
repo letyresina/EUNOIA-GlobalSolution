@@ -13,7 +13,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id da sessão.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SessionId { get; set; }
 
         // Chave estrangeira para User

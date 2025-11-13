@@ -12,7 +12,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id do Log
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LogId { get; set; }
 
         // Chave estrangeira para User

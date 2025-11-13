@@ -13,7 +13,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id da emoção.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmotionId { get; set; }
 
         // Chave estrangeira para EmotionSession

@@ -11,7 +11,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id do usuário.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
 
         /// <summary>

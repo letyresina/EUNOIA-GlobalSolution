@@ -12,7 +12,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Id do feedback.
         /// </summary>
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int FeedbackId { get; set; }
 
         // Chave estrangeira para EmotionSession
