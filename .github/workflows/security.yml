@@ -120,11 +120,11 @@ jobs:
         run: mkdir -p ZAP_2.16.1/zap-reports && chmod -R 777 ZAP_2.16.1/zap-reports
 
       - name: Update ZAP add-ons
-        run: ./ZAP_2.16.1/zap.sh -cmd -addonupdate
+        run: ./ZAP_2.16.1/zap.sh -cmd -port 8090 -addonupdate
 
       - name: Run ZAP Baseline Scan
         run: |
-          ./ZAP_2.16.1/zap.sh -cmd -quickurl http://localhost:8080 -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
+          ./ZAP_2.16.1/zap.sh -cmd -port 8090 -quickurl http://localhost:8080 -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
