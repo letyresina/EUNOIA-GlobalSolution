@@ -1,0 +1,160 @@
+name: CI/CD Security Pipeline - C#
+
+permissions:
+  security-events: write
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ================================
+  # 1. SAST - Semgrep (Análise Estática)
+  # ================================
+  sast:
+    name: SAST - Semgrep (C#)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python and Semgrep
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip install semgrep
+
+      - name: Run Semgrep on C# project
+        run: |
+          semgrep --config=p/ci --sarif --output semgrep.sarif || true
+
+      - name: Upload SAST Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-report
+          path: semgrep.sarif
+
+      - name: Upload to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+  # ================================
+  # 2. SCA - Snyk (Dependências .NET)
+  # ================================
+  sca:
+    name: SCA - Snyk (Dependências .NET)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+        with:
+          version: "latest"
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk test on .NET project
+        run: snyk test --json > snyk-report.json || true
+
+      - name: Upload SCA Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-report
+          path: snyk-report.json
+
+  # ================================
+  # 3. DAST - OWASP ZAP
+  # ================================
+  dast:
+    name: DAST - OWASP ZAP (Dynamic Scan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build API
+        run: dotnet build --configuration Release
+
+      - name: Publish API
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Start API in background
+        run: |
+          nohup dotnet ./publish/SecureAPI.dll --urls "http://localhost:5000" > app.log 2>&1 &
+          for i in {1..12}; do
+            nc -z localhost 5000 && break
+            echo "⏳ Waiting for API to start..."
+            sleep 5
+          done
+
+      - name: Install OWASP ZAP 2.16.1
+        run: |
+          wget https://github.com/zaproxy/zaproxy/releases/download/v2.16.1/ZAP_2.16.1_Linux.tar.gz
+          tar -xzf ZAP_2.16.1_Linux.tar.gz
+          chmod +x ZAP_2.16.1/zap.sh
+
+      - name: Prepare report directory
+        run: mkdir -p ZAP_2.16.1/zap-reports && chmod -R 777 ZAP_2.16.1/zap-reports
+
+      - name: Update ZAP add-ons
+        run: ./ZAP_2.16.1/zap.sh -cmd -addonupdate
+
+      - name: Run OWASP ZAP Baseline Scan
+        run: |
+          ./ZAP_2.16.1/zap.sh -cmd -quickurl http://localhost:5000 -quickout ZAP_2.16.1/zap-reports/zap-report.html
+
+      - name: Upload DAST Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast-report
+          path: ZAP_2.16.1/zap-reports
+
+  # ================================
+  # 4. Integração & Monitoramento
+  # ================================
+  integration:
+    name: Integration & Vulnerability Check
+    runs-on: ubuntu-latest
+    needs: [sast, sca, dast]
+    steps:
+      - name: Download SAST report
+        uses: actions/download-artifact@v4
+        with:
+          name: sast-report
+          path: reports/sast
+
+      - name: Download SCA report
+        uses: actions/download-artifact@v4
+        with:
+          name: sca-report
+          path: reports/sca
+
+      - name: Download DAST report
+        uses: actions/download-artifact@v4
+        with:
+          name: dast-report
+          path: reports/dast
+
+      - name: Check for critical vulnerabilities
+        run: |
+          echo "🔎 Verificando vulnerabilidades críticas..."
+          if grep -i "CRITICAL" reports/*/*; then
+            echo "❌ Vulnerabilidades críticas encontradas. Bloqueando deploy."
+            exit 1
+          else
+            echo "✅ Nenhuma vulnerabilidade crítica detectada."
+          fi
