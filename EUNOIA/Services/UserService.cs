@@ -139,5 +139,27 @@ namespace EUNOIA.Services
             return PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash);
         }
 
+        public async Task<UserWithPrivacySettingDto?> GetByCPFWithPrivacySettingAsync(string cpf)
+        {
+            var user = await _repository.GetByCPFWithPrivacySettingAsync(cpf);
+            if (user == null || user.PrivacySetting == null) return null;
+
+            return new UserWithPrivacySettingDto
+            {
+                CPF = user.CPF,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Department = user.Department,
+                CreatedAt = user.CreatedAt,
+                IsActive = user.IsActive,
+                CompanyId = user.CompanyId,
+                AllowFacialRecognition = user.PrivacySetting.AllowFacialRecognition,
+                AllowDataSharing = user.PrivacySetting.AllowDataSharing,
+                AnonymizeReports = user.PrivacySetting.AnonymizeReports,
+                PrivacyUpdatedAt = user.PrivacySetting.UpdatedAt
+            };
+        }
+
     }
 }

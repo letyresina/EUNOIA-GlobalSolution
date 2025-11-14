@@ -88,6 +88,16 @@ namespace EUNOIA.Controllers
 
             return Ok("Login realizado com sucesso.");
         }
+
+        [HttpGet("{cpf}/with-privacy-setting")]
+        [ProducesResponseType(typeof(UserWithPrivacySettingDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserWithPrivacySettingDto>> GetByCPFWithPrivacySetting(string cpf)
+        {
+            var user = await _service.GetByCPFWithPrivacySettingAsync(cpf);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
     }
 
 }

@@ -52,5 +52,12 @@ namespace EUNOIA.Repositories
                 .FirstOrDefaultAsync(u => u.CPF == cpf);
         }
 
+        public async Task<User?> GetByCPFWithPrivacySettingAsync(string cpf)
+        {
+            return await _context.Users
+                .Include(u => u.PrivacySetting)
+                .FirstOrDefaultAsync(u => u.CPF == cpf);
+        }
+
     }
 }
