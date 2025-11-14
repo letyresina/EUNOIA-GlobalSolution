@@ -110,5 +110,14 @@ namespace EUNOIA.Services
                 CompanyCNPJ = user.Company.CNPJ
             };
         }
+
+        public async Task<bool> AuthenticateAsync(LoginDto dto)
+        {
+            var user = await _repository.GetByCPFAsync(dto.CPF);
+            if (user == null) return false;
+
+            return PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash);
+        }
+
     }
 }

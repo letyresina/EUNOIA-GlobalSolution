@@ -74,5 +74,20 @@ namespace EUNOIA.Controllers
             if (user == null) return NotFound();
             return Ok(user);
         }
+
+        /// <summary>
+        /// Autentica um usuário pelo CPF e senha.
+        /// </summary>
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var isAuthenticated = await _service.AuthenticateAsync(dto);
+            if (!isAuthenticated) return Unauthorized("CPF ou senha inválidos.");
+
+            return Ok("Login realizado com sucesso.");
+        }
     }
+
 }
