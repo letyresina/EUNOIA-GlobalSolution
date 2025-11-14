@@ -66,7 +66,9 @@ jobs:
           version: "latest"
 
       - name: Authenticate Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk auth "$SNYK_TOKEN"
 
       - name: Run Snyk test
         run: snyk test --json > snyk-report.json || true
@@ -126,11 +128,15 @@ jobs:
         run: |
           ./ZAP_2.16.1/zap.sh -cmd -port 8090 -quickurl http://localhost:8080 -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
 
+      - name: Ensure report folder exists
+        run: mkdir -p ZAP_2.16.1/zap-reports
+
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
         with:
           name: dast-report
           path: ZAP_2.16.1/zap-reports
+          if-no-files-found: ignore
 
   # ================================
   # 4. Integração & Monitoramento
@@ -157,11 +163,12 @@ jobs:
         with:
           name: dast-report
           path: reports/dast
+          if-no-files-found: ignore
 
       - name: Check for critical vulnerabilities
         run: |
           echo "🔎 Verificando vulnerabilidades críticas..."
-          if grep -i "CRITICAL" reports/*/*; then
+          if grep -Ri "CRITICAL" reports/*/* 2>/dev/null; then
             echo "❌ Vulnerabilidades críticas encontradas. Bloqueando deploy."
             exit 1
           else
