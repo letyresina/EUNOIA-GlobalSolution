@@ -42,7 +42,9 @@ namespace EUNOIA.Models
         /// </summary>
         public bool IsActive { get; set; } = true;
 
-        // Relacionamento
+        /// <summary>
+        /// Lista de usuários associados à empresa.
+        /// </summary>
         public ICollection<User> Users { get; set; } = new List<User>();
 
     }

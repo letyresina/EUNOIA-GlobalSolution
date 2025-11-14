@@ -10,34 +10,40 @@ namespace EUNOIA.Models
     public class AuditLog
     {
         /// <summary>
-        /// Id do Log
+        /// Identificador único do log.
         /// </summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LogId { get; set; }
 
-        // Chave estrangeira para User
+        /// <summary>
+        /// Identificador do usuário relacionado ao log.
+        /// </summary>
         [ForeignKey("User")]
         public int UserId { get; set; }
+
+        /// <summary>
+        /// Usuário relacionado ao log.
+        /// </summary>
         public required User User { get; set; }
 
         /// <summary>
-        /// Ação realizada
+        /// Tipo de ação realizada na API.
         /// </summary>
         public AuditAction Action { get; set; }
 
         /// <summary>
-        /// Data e hora de quando foi realizado a ação
+        /// Data e hora em que a ação foi registrada.
         /// </summary>
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// IP de origem da requisição
+        /// Endereço IP de origem da requisição.
         /// </summary>
         [Required, MaxLength(50)]
         public required string IpAddress { get; set; }
 
         /// <summary>
-        /// Se a ação foi realizada com sucesso ou não
+        /// Indica se a ação foi realizada com sucesso.
         /// </summary>
         public bool IsSuccessful { get; set; }
     }

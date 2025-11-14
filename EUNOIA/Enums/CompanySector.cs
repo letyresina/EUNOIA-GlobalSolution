@@ -7,6 +7,9 @@ namespace EUNOIA.Enums
     /// </summary>
     public enum CompanySector
     {
+        /// <summary>
+        /// Setor de tecnologia.
+        /// </summary>
         Tecnologia = 1,
 
         [EnumMember(Value = "Saúde")]

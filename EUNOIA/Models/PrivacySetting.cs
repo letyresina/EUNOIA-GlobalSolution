@@ -9,30 +9,39 @@ namespace EUNOIA.Models
     public class PrivacySetting
     {
         /// <summary>
-        /// Id das configurações.
+        /// Identificador único das configurações de privacidade.
         /// </summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SettingId { get; set; }
 
-        // Chave estrangeira para User
+        /// <summary>
+        /// Identificador do usuário ao qual as configurações pertencem.
+        /// </summary>
         [ForeignKey("User")]
         public int UserId { get; set; }
+
+        /// <summary>
+        /// Usuário relacionado às configurações de privacidade.
+        /// </summary>
         public User? User { get; set; }
 
         /// <summary>
-        /// Configuração para caso o usuário permita seu reconhecimento facial.
+        /// Indica se o usuário permite o uso de reconhecimento facial.
         /// </summary>
         public bool AllowFacialRecognition { get; set; } = true;
+
         /// <summary>
-        /// Configuração para caso o usuário permita o compartilhamento de seus dados.
+        /// Indica se o usuário permite o compartilhamento de seus dados.
         /// </summary>
         public bool AllowDataSharing { get; set; } = false;
+
         /// <summary>
-        /// Configuração para caso o usuário deseja que seu nome não apareça nos relatórios.
+        /// Indica se o nome do usuário deve ser anonimizado nos relatórios.
         /// </summary>
         public bool AnonymizeReports { get; set; } = false;
+
         /// <summary>
-        /// Quando foi a última vez que foi atualizada.
+        /// Data e hora da última atualização das configurações.
         /// </summary>
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }

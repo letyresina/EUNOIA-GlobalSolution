@@ -2,8 +2,16 @@
 
 namespace EUNOIA.Security
 {
+    /// <summary>
+    /// Classe utilitária responsável por gerar e verificar hashes de senha com sal usando PBKDF2.
+    /// </summary>
     public static class PasswordHasher
     {
+        /// <summary>
+        /// Gera um hash seguro para a senha fornecida, utilizando PBKDF2 com SHA256 e sal aleatório.
+        /// </summary>
+        /// <param name="password">Senha em texto puro a ser protegida.</param>
+        /// <returns>Hash da senha codificado em Base64, contendo o sal e o hash concatenados.</returns>
         public static string HashPassword(string password)
         {
             byte[] salt = RandomNumberGenerator.GetBytes(16);
@@ -21,6 +29,12 @@ namespace EUNOIA.Security
             return Convert.ToBase64String(hashBytes);
         }
 
+        /// <summary>
+        /// Verifica se a senha fornecida corresponde ao hash armazenado.
+        /// </summary>
+        /// <param name="password">Senha em texto puro a ser verificada.</param>
+        /// <param name="storedHash">Hash armazenado em Base64 contendo sal e hash.</param>
+        /// <returns>True se a senha for válida; caso contrário, false.</returns>
         public static bool VerifyPassword(string password, string storedHash)
         {
             byte[] hashBytes = Convert.FromBase64String(storedHash);

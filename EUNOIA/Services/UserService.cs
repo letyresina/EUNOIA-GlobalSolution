@@ -6,18 +6,29 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EUNOIA.Services
 {
+    /// <summary>
+    /// Serviço responsável pelas operações de negócio relacionadas à entidade User.
+    /// </summary>
     public class UserService
     {
         private readonly UserRepository _repository;
-
         private readonly PrivacySettingRepository _privacyRepository;
 
+        /// <summary>
+        /// Inicializa uma nova instância do serviço com os repositórios de usuários e configurações de privacidade.
+        /// </summary>
+        /// <param name="repository">Repositório de usuários.</param>
+        /// <param name="privacyRepository">Repositório de configurações de privacidade.</param>
         public UserService(UserRepository repository, PrivacySettingRepository privacyRepository)
         {
             _repository = repository;
             _privacyRepository = privacyRepository;
         }
 
+        /// <summary>
+        /// Retorna todos os usuários cadastrados.
+        /// </summary>
+        /// <returns>Lista de objetos <see cref="UserDto"/>.</returns>
         public async Task<List<UserDto>> GetAllAsync()
         {
             var users = await _repository.GetAllAsync();
@@ -34,6 +45,11 @@ namespace EUNOIA.Services
             }).ToList();
         }
 
+        /// <summary>
+        /// Busca um usuário pelo CPF.
+        /// </summary>
+        /// <param name="cpf">CPF do usuário.</param>
+        /// <returns>Objeto <see cref="UserDto"/> ou null se não encontrado.</returns>
         public async Task<UserDto?> GetByCPFAsync(string cpf)
         {
             var user = await _repository.GetByCPFAsync(cpf);
@@ -52,6 +68,10 @@ namespace EUNOIA.Services
             };
         }
 
+        /// <summary>
+        /// Adiciona um novo usuário ao sistema e cria automaticamente sua configuração de privacidade.
+        /// </summary>
+        /// <param name="dto">DTO contendo os dados do novo usuário.</param>
         public async Task AddAsync(CreateUserDto dto)
         {
             var hashedPassword = PasswordHasher.HashPassword(dto.PasswordHash);
@@ -70,7 +90,6 @@ namespace EUNOIA.Services
 
             await _repository.AddAsync(user);
 
-            // Criação automática da configuração de privacidade
             var privacySetting = new PrivacySetting
             {
                 UserId = user.UserId,
@@ -83,6 +102,11 @@ namespace EUNOIA.Services
             await _privacyRepository.AddAsync(privacySetting);
         }
 
+        /// <summary>
+        /// Atualiza os dados de um usuário com base no CPF.
+        /// </summary>
+        /// <param name="cpf">CPF do usuário.</param>
+        /// <param name="dto">DTO com os dados atualizados.</param>
         public async Task UpdateByCPFAsync(string cpf, CreateUserDto dto)
         {
             var user = await _repository.GetByCPFAsync(cpf);
@@ -101,6 +125,10 @@ namespace EUNOIA.Services
             await _repository.UpdateAsync(user);
         }
 
+        /// <summary>
+        /// Remove um usuário com base no CPF.
+        /// </summary>
+        /// <param name="cpf">CPF do usuário a ser removido.</param>
         public async Task DeleteByCPFAsync(string cpf)
         {
             await _repository.DeleteByCPFAsync(cpf);
@@ -131,6 +159,11 @@ namespace EUNOIA.Services
             };
         }
 
+        /// <summary>
+        /// Autentica um usuário com base no CPF e senha fornecidos.
+        /// </summary>
+        /// <param name="dto">DTO contendo CPF e senha.</param>
+        /// <returns>True se a autenticação for bem-sucedida; caso contrário, false.</returns>
         public async Task<bool> AuthenticateAsync(LoginDto dto)
         {
             var user = await _repository.GetByCPFAsync(dto.CPF);
@@ -139,6 +172,11 @@ namespace EUNOIA.Services
             return PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash);
         }
 
+        /// <summary>
+        /// Obtém um usuário pelo CPF, incluindo suas configurações de privacidade.
+        /// </summary>
+        /// <param name="cpf">CPF do usuário.</param>
+        /// <returns>Um <see cref="UserWithPrivacySettingDto"/> com os dados do usuário e suas configurações de privacidade, ou null se não encontrado.</returns>
         public async Task<UserWithPrivacySettingDto?> GetByCPFWithPrivacySettingAsync(string cpf)
         {
             var user = await _repository.GetByCPFWithPrivacySettingAsync(cpf);
@@ -160,6 +198,5 @@ namespace EUNOIA.Services
                 PrivacyUpdatedAt = user.PrivacySetting.UpdatedAt
             };
         }
-
     }
 }

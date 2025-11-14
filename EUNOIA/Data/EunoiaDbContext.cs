@@ -7,19 +7,42 @@ namespace EUNOIA.Data
     /// Contexto principal do banco de dados da aplicação Eunoia.
     /// Responsável por mapear as entidades (Models) para as tabelas do SQL Server.
     /// </summary>
-    public class EunoiaDbContext : DbContext
+    public class EunoiaDbContext(DbContextOptions<EunoiaDbContext> options) : DbContext(options)
     {
-        public EunoiaDbContext(DbContextOptions<EunoiaDbContext> options)
-            : base(options)
-        {
-        }
+        /// <summary>
+        /// Construtor do contexto do banco de dados Eunoia.
+        /// </summary>
+        /// <param name="options">Opções de configuração do contexto.</param>
+        // Construtor primário utilizado (IDE0290)
 
-        // Tabelas principais
+        /// <summary>
+        /// Tabela de usuários do sistema.
+        /// </summary>
         public DbSet<User> Users { get; set; }
+
+        /// <summary>
+        /// Tabela de empresas cadastradas.
+        /// </summary>
         public DbSet<Company> Companies { get; set; }
+
+        /// <summary>
+        /// Tabela de feedbacks das sessões de emoção.
+        /// </summary>
         public DbSet<Feedback> Feedbacks { get; set; }
+
+        /// <summary>
+        /// Tabela de sessões de emoção dos usuários.
+        /// </summary>
         public DbSet<EmotionSession> EmotionSessions { get; set; }
+
+        /// <summary>
+        /// Tabela de configurações de privacidade dos usuários.
+        /// </summary>
         public DbSet<PrivacySetting> PrivacySettings { get; set; }
+
+        /// <summary>
+        /// Tabela de logs de auditoria do sistema.
+        /// </summary>
         public DbSet<AuditLog> AuditLogs { get; set; }
 
         /// <summary>

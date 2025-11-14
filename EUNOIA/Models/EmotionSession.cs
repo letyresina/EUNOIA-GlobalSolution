@@ -16,9 +16,15 @@ namespace EUNOIA.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SessionId { get; set; }
 
-        // Chave estrangeira para User
+        /// <summary>
+        /// Chave estrangeira para o usuário relacionado à sessão.
+        /// </summary>
         [ForeignKey("User")]
         public int UserId { get; set; }
+
+        /// <summary>
+        /// Usuário relacionado à sessão.
+        /// </summary>
         public required User User { get; set; }
 
         /// <summary>
@@ -37,23 +43,29 @@ namespace EUNOIA.Models
         public DeviceType Device { get; set; }
 
         /// <summary>
-        /// Nível de confiança do modelo
+        /// Nível de confiança do modelo.
         /// </summary>
         [Precision(5, 2)]
         public decimal ConfidenceScore { get; set; }
 
         /// <summary>
-        /// Por quem foi processado
+        /// Por quem foi processado.
         /// </summary>
         public ProcessedByType ProcessedBy { get; set; }
 
         /// <summary>
-        /// Indica se os dados foram anonimizados para relatório
+        /// Indica se os dados foram anonimizados para relatório.
         /// </summary>
         public bool IsAnonymized { get; set; } = false;
 
-        // Relacionamentos
+        /// <summary>
+        /// Lista de emoções detectadas durante a sessão.
+        /// </summary>
         public ICollection<Emotion> Emotions { get; set; } = new List<Emotion>();
+
+        /// <summary>
+        /// Lista de feedbacks associados à sessão.
+        /// </summary>
         public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     }
 }

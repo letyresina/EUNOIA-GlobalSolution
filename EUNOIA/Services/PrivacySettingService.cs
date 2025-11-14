@@ -4,15 +4,26 @@ using EUNOIA.Repositories;
 
 namespace EUNOIA.Services
 {
+    /// <summary>
+    /// Serviço responsável pelas operações de negócio relacionadas às configurações de privacidade dos usuários.
+    /// </summary>
     public class PrivacySettingService
     {
         private readonly PrivacySettingRepository _repository;
 
+        /// <summary>
+        /// Inicializa uma nova instância do serviço com o repositório de configurações de privacidade.
+        /// </summary>
+        /// <param name="repository">Instância do repositório de configurações de privacidade.</param>
         public PrivacySettingService(PrivacySettingRepository repository)
         {
             _repository = repository;
         }
 
+        /// <summary>
+        /// Retorna todas as configurações de privacidade cadastradas.
+        /// </summary>
+        /// <returns>Lista de objetos <see cref="PrivacySettingDto"/>.</returns>
         public async Task<List<PrivacySettingDto>> GetAllAsync()
         {
             var settings = await _repository.GetAllAsync();
@@ -27,6 +38,11 @@ namespace EUNOIA.Services
             }).ToList();
         }
 
+        /// <summary>
+        /// Busca a configuração de privacidade de um usuário, incluindo os dados do usuário.
+        /// </summary>
+        /// <param name="userId">Identificador do usuário.</param>
+        /// <returns>Objeto <see cref="PrivacySettingWithUserDto"/> ou null se não encontrado.</returns>
         public async Task<PrivacySettingWithUserDto?> GetByUserIdWithUserAsync(int userId)
         {
             var setting = await _repository.GetByUserIdWithUserAsync(userId);
@@ -46,6 +62,10 @@ namespace EUNOIA.Services
             };
         }
 
+        /// <summary>
+        /// Adiciona uma nova configuração de privacidade ao sistema.
+        /// </summary>
+        /// <param name="dto">DTO contendo os dados da configuração de privacidade.</param>
         public async Task AddAsync(CreatePrivacySettingDto dto)
         {
             var setting = new PrivacySetting
@@ -60,9 +80,14 @@ namespace EUNOIA.Services
             await _repository.AddAsync(setting);
         }
 
+        /// <summary>
+        /// Atualiza a configuração de privacidade de um usuário existente.
+        /// </summary>
+        /// <param name="userId">Identificador do usuário.</param>
+        /// <param name="dto">DTO com os dados atualizados.</param>
         public async Task UpdateAsync(int userId, CreatePrivacySettingDto dto)
         {
-            var setting = await _repository.GetByUserIdAsync(userId);
+            var setting = await _repository.GetByUserIdWithUserAsync(userId);
             if (setting == null) return;
 
             setting.AllowFacialRecognition = dto.AllowFacialRecognition;
@@ -73,6 +98,10 @@ namespace EUNOIA.Services
             await _repository.UpdateAsync(setting);
         }
 
+        /// <summary>
+        /// Remove a configuração de privacidade de um usuário com base no seu identificador.
+        /// </summary>
+        /// <param name="userId">Identificador do usuário.</param>
         public async Task DeleteByUserIdAsync(int userId)
         {
             await _repository.DeleteByUserIdAsync(userId);
