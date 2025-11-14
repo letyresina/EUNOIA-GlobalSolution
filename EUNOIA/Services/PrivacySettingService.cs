@@ -27,19 +27,22 @@ namespace EUNOIA.Services
             }).ToList();
         }
 
-        public async Task<PrivacySettingDto?> GetByUserIdAsync(int userId)
+        public async Task<PrivacySettingWithUserDto?> GetByUserIdWithUserAsync(int userId)
         {
-            var setting = await _repository.GetByUserIdAsync(userId);
-            if (setting == null) return null;
+            var setting = await _repository.GetByUserIdWithUserAsync(userId);
+            if (setting == null || setting.User == null) return null;
 
-            return new PrivacySettingDto
+            return new PrivacySettingWithUserDto
             {
                 SettingId = setting.SettingId,
                 UserId = setting.UserId,
                 AllowFacialRecognition = setting.AllowFacialRecognition,
                 AllowDataSharing = setting.AllowDataSharing,
                 AnonymizeReports = setting.AnonymizeReports,
-                UpdatedAt = setting.UpdatedAt
+                UpdatedAt = setting.UpdatedAt,
+                UserName = setting.User.Name,
+                UserEmail = setting.User.Email,
+                UserCPF = setting.User.CPF
             };
         }
 

@@ -18,10 +18,13 @@ namespace EUNOIA.Repositories
             return await _context.PrivacySettings.ToListAsync();
         }
 
-        public async Task<PrivacySetting?> GetByUserIdAsync(int userId)
+        public async Task<PrivacySetting?> GetByUserIdWithUserAsync(int userId)
         {
-            return await _context.PrivacySettings.FirstOrDefaultAsync(p => p.UserId == userId);
+            return await _context.PrivacySettings
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.UserId == userId);
         }
+
 
         public async Task AddAsync(PrivacySetting setting)
         {

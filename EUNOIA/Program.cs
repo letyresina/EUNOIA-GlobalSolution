@@ -18,6 +18,10 @@ builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<UserRepository>();
 
+// Injeção de dependência para PrivacySetting
+builder.Services.AddScoped<PrivacySettingRepository>();
+builder.Services.AddScoped<PrivacySettingService>();
+
 
 // Controllers + Configuração para enums como texto
 builder.Services.AddControllers()

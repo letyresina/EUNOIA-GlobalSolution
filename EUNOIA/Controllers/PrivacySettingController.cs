@@ -24,12 +24,12 @@ namespace EUNOIA.Controllers
             return Ok(settings);
         }
 
-        [HttpGet("{userId}")]
-        [ProducesResponseType(typeof(PrivacySettingDto), StatusCodes.Status200OK)]
+        [HttpGet("{userId}/with-user")]
+        [ProducesResponseType(typeof(PrivacySettingWithUserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PrivacySettingDto>> GetByUserId(int userId)
+        public async Task<ActionResult<PrivacySettingWithUserDto>> GetByUserIdWithUser(int userId)
         {
-            var setting = await _service.GetByUserIdAsync(userId);
+            var setting = await _service.GetByUserIdWithUserAsync(userId);
             if (setting == null) return NotFound();
             return Ok(setting);
         }
@@ -39,7 +39,7 @@ namespace EUNOIA.Controllers
         public async Task<IActionResult> Create([FromBody] CreatePrivacySettingDto dto)
         {
             await _service.AddAsync(dto);
-            return CreatedAtAction(nameof(GetByUserId), new { userId = dto.UserId }, null);
+            return CreatedAtAction(nameof(GetByUserIdWithUser), new { userId = dto.UserId }, null);
         }
 
         [HttpPut("{userId}")]

@@ -10,9 +10,12 @@ namespace EUNOIA.Services
     {
         private readonly UserRepository _repository;
 
-        public UserService(UserRepository repository)
+        private readonly PrivacySettingRepository _privacyRepository;
+
+        public UserService(UserRepository repository, PrivacySettingRepository privacyRepository)
         {
             _repository = repository;
+            _privacyRepository = privacyRepository;
         }
 
         public async Task<List<UserDto>> GetAllAsync()
@@ -66,6 +69,18 @@ namespace EUNOIA.Services
             };
 
             await _repository.AddAsync(user);
+
+            // Criação automática da configuração de privacidade
+            var privacySetting = new PrivacySetting
+            {
+                UserId = user.UserId,
+                AllowFacialRecognition = true,
+                AllowDataSharing = false,
+                AnonymizeReports = false,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _privacyRepository.AddAsync(privacySetting);
         }
 
         public async Task UpdateByCPFAsync(string cpf, CreateUserDto dto)
@@ -91,6 +106,11 @@ namespace EUNOIA.Services
             await _repository.DeleteByCPFAsync(cpf);
         }
 
+        /// <summary>
+        /// Obtém um usuário pelo CPF, incluindo informações da empresa associada.
+        /// </summary>
+        /// <param name="cpf">CPF do usuário a ser consultado.</param>
+        /// <returns>Um <see cref="UserWithCompanyDto"/> contendo os dados do usuário e da empresa, ou null se não encontrado.</returns>
         public async Task<UserWithCompanyDto?> GetByCPFWithCompanyAsync(string cpf)
         {
             var user = await _repository.GetByCPFWithCompanyAsync(cpf);
