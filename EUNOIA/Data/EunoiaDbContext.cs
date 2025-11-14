@@ -60,6 +60,11 @@ namespace EUNOIA.Data
                 .HasOne(a => a.User)
                 .WithMany(u => u.AuditLogs)
                 .HasForeignKey(a => a.UserId);
+
+            // Garante que cada usuário tenha apenas uma configuração de privacidade
+            modelBuilder.Entity<PrivacySetting>()
+                .HasIndex(p => p.UserId)
+                .IsUnique();
         }
     }
 }

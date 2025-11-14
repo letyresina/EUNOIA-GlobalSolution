@@ -17,7 +17,7 @@ namespace EUNOIA.Models
         // Chave estrangeira para User
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public required User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Configuração para caso o usuário permita seu reconhecimento facial.
