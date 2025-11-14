@@ -1,6 +1,8 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Models;
 using EUNOIA.Repositories;
+using EUNOIA.Security;
+using Microsoft.AspNetCore.Identity;
 
 namespace EUNOIA.Services
 {
@@ -49,11 +51,13 @@ namespace EUNOIA.Services
 
         public async Task AddAsync(CreateUserDto dto)
         {
+            var hashedPassword = PasswordHasher.HashPassword(dto.PasswordHash);
+
             var user = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = dto.PasswordHash,
+                PasswordHash = hashedPassword,
                 Role = dto.Role,
                 Department = dto.Department,
                 CPF = dto.CPF,
@@ -69,9 +73,11 @@ namespace EUNOIA.Services
             var user = await _repository.GetByCPFAsync(cpf);
             if (user == null) return;
 
+            var hashedPassword = PasswordHasher.HashPassword(dto.PasswordHash);
+
             user.Name = dto.Name;
             user.Email = dto.Email;
-            user.PasswordHash = dto.PasswordHash;
+            user.PasswordHash = hashedPassword;
             user.Role = dto.Role;
             user.Department = dto.Department;
             user.IsActive = dto.IsActive;
@@ -83,6 +89,26 @@ namespace EUNOIA.Services
         public async Task DeleteByCPFAsync(string cpf)
         {
             await _repository.DeleteByCPFAsync(cpf);
+        }
+
+        public async Task<UserWithCompanyDto?> GetByCPFWithCompanyAsync(string cpf)
+        {
+            var user = await _repository.GetByCPFWithCompanyAsync(cpf);
+            if (user == null || user.Company == null) return null;
+
+            return new UserWithCompanyDto
+            {
+                CPF = user.CPF,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Department = user.Department,
+                CreatedAt = user.CreatedAt,
+                IsActive = user.IsActive,
+                CompanyId = user.CompanyId,
+                CompanyName = user.Company.Name,
+                CompanyCNPJ = user.Company.CNPJ
+            };
         }
     }
 }

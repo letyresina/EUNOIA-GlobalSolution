@@ -14,6 +14,11 @@ builder.Services.AddDbContext<EunoiaDbContext>(options =>
 builder.Services.AddScoped<CompanyRepository>();
 builder.Services.AddScoped<CompanyService>();
 
+// Injeção de dependência para User
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserRepository>();
+
+
 // Controllers + Configuração para enums como texto
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

@@ -15,6 +15,13 @@ namespace EUNOIA.Models
         public int UserId { get; set; }
 
         /// <summary>
+        /// CPF do usuário.
+        /// </summary>
+        [Required, MaxLength(14)]
+        public string CPF { get; set; } = string.Empty;
+
+
+        /// <summary>
         /// Nome do usuário.
         /// </summary>
         [Required, MaxLength(100)]
@@ -57,10 +64,10 @@ namespace EUNOIA.Models
         // Chave estrangeira para Company
         [ForeignKey("Company")]
         public int CompanyId { get; set; }
-        public required Company Company { get; set; }
+        public Company Company { get; set; } = null;
 
         // Relacionamentos
-        public required PrivacySetting PrivacySetting { get; set; }
+        public PrivacySetting? PrivacySetting { get; set; }
         public ICollection<EmotionSession> EmotionSessions { get; set; } = new List<EmotionSession>();
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
     }

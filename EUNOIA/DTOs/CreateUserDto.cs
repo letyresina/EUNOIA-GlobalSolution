@@ -8,7 +8,7 @@ namespace EUNOIA.DTOs
         public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(150)]
-        [EmailAddress, ErrorMessage = "Email inválido. Informe um email válido."]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [Required]

@@ -44,5 +44,13 @@ namespace EUNOIA.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<User?> GetByCPFWithCompanyAsync(string cpf)
+        {
+            return await _context.Users
+                .Include(u => u.Company)
+                .FirstOrDefaultAsync(u => u.CPF == cpf);
+        }
+
     }
 }

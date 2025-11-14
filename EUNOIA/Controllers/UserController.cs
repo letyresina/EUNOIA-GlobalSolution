@@ -16,9 +16,6 @@ namespace EUNOIA.Controllers
             _service = service;
         }
 
-        /// <summary>
-        /// Retorna todos os usuários cadastrados.
-        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<UserDto>>> GetAll()
@@ -27,9 +24,6 @@ namespace EUNOIA.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Retorna os dados de um usuário pelo CPF.
-        /// </summary>
         [HttpGet("{cpf}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -40,9 +34,6 @@ namespace EUNOIA.Controllers
             return Ok(user);
         }
 
-        /// <summary>
-        /// Cria um novo usuário.
-        /// </summary>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,9 +43,6 @@ namespace EUNOIA.Controllers
             return CreatedAtAction(nameof(GetByCPF), new { cpf = dto.CPF }, null);
         }
 
-        /// <summary>
-        /// Atualiza os dados de um usuário pelo CPF.
-        /// </summary>
         [HttpPut("{cpf}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -65,9 +53,6 @@ namespace EUNOIA.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Remove um usuário pelo CPF.
-        /// </summary>
         [HttpDelete("{cpf}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -75,6 +60,19 @@ namespace EUNOIA.Controllers
         {
             await _service.DeleteByCPFAsync(cpf);
             return NoContent();
+        }
+
+        /// <summary>
+        /// Retorna os dados do usuário junto com a empresa vinculada.
+        /// </summary>
+        [HttpGet("{cpf}/with-company")]
+        [ProducesResponseType(typeof(UserWithCompanyDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserWithCompanyDto>> GetByCPFWithCompany(string cpf)
+        {
+            var user = await _service.GetByCPFWithCompanyAsync(cpf);
+            if (user == null) return NotFound();
+            return Ok(user);
         }
     }
 }
