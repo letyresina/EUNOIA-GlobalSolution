@@ -25,7 +25,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Usuário relacionado à sessão.
         /// </summary>
-        public required User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Quando o Feedback foi capturado.

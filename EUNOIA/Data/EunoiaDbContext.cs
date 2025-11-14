@@ -45,6 +45,12 @@ namespace EUNOIA.Data
         /// </summary>
         public DbSet<AuditLog> AuditLogs { get; set; }
 
+
+        /// <summary>
+        /// Tabela de emoções primárias detectadas nas sessões.
+        /// </summary>
+        public DbSet<Emotion> Emotions { get; set; }
+
         /// <summary>
         /// Configurações adicionais de mapeamento entre Models e Banco de Dados.
         /// </summary>

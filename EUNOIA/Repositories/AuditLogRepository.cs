@@ -11,14 +11,19 @@ namespace EUNOIA.Repositories
     {
         private readonly EunoiaDbContext _context;
 
+        /// <summary>
+        /// Inicializa uma nova instância do repositório com o contexto do banco de dados.
+        /// </summary>
+        /// <param name="context">Contexto do banco de dados Eunoia.</param>
         public AuditLogRepository(EunoiaDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Retorna todos os logs de auditoria.
+        /// Retorna todos os logs de auditoria, incluindo os dados do usuário associado.
         /// </summary>
+        /// <returns>Lista de logs de auditoria ordenados por data decrescente.</returns>
         public async Task<List<AuditLog>> GetAllAsync()
         {
             return await _context.AuditLogs
@@ -28,8 +33,10 @@ namespace EUNOIA.Repositories
         }
 
         /// <summary>
-        /// Retorna os logs de auditoria de um usuário específico.
+        /// Retorna os logs de auditoria de um usuário específico, incluindo os dados do usuário.
         /// </summary>
+        /// <param name="userId">Identificador do usuário.</param>
+        /// <returns>Lista de logs de auditoria do usuário ordenados por data decrescente.</returns>
         public async Task<List<AuditLog>> GetByUserIdAsync(int userId)
         {
             return await _context.AuditLogs
@@ -40,8 +47,9 @@ namespace EUNOIA.Repositories
         }
 
         /// <summary>
-        /// Adiciona um novo log de auditoria.
+        /// Adiciona um novo log de auditoria ao banco de dados.
         /// </summary>
+        /// <param name="log">Objeto <see cref="AuditLog"/> a ser inserido.</param>
         public async Task AddAsync(AuditLog log)
         {
             _context.AuditLogs.Add(log);

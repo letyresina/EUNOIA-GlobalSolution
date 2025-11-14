@@ -24,7 +24,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Sessão de emoção associada a esta emoção.
         /// </summary>
-        public required EmotionSession EmotionSession { get; set; }
+        public EmotionSession? EmotionSession { get; set; }
 
         /// <summary>
         /// Emoção primária detectada.
