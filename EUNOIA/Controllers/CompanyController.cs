@@ -8,7 +8,8 @@ namespace EUNOIA.Controllers
     /// Controlador responsável pelas operações relacionadas à entidade Empresa.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class CompanyController(CompanyService service) : ControllerBase
     {

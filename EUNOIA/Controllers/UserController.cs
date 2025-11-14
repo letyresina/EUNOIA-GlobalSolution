@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace EUNOIA.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     /// <summary>
     /// Controlador responsável por gerenciar operações relacionadas a usuários.

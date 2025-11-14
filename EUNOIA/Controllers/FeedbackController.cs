@@ -8,7 +8,8 @@ namespace EUNOIA.Controllers
     /// Controller responsável pelos endpoints de feedbacks.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class FeedbackController : ControllerBase
     {

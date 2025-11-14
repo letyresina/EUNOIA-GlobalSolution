@@ -8,7 +8,8 @@ namespace EUNOIA.Controllers
     /// Controller responsável pelos endpoints de sessões de emoção.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class EmotionSessionController : ControllerBase
     {

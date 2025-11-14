@@ -3,8 +3,29 @@ using EUNOIA.Repositories;
 using EUNOIA.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer; 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adiciona suporte ao versionamento de API
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+});
+
+// Adiciona suporte ao versionamento no Swagger
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; 
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<EUNOIA.Configuration.ConfigureSwaggerOptions>();
+
 
 // Conexão com o SQL Server
 builder.Services.AddDbContext<EunoiaDbContext>(options =>
@@ -40,8 +61,18 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"EUNOIA API {description.GroupName.ToUpperInvariant()}");
+        }
+    });
 }
+
 
 app.UseHttpsRedirection();
 
