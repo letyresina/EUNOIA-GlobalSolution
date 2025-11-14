@@ -24,7 +24,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Sessão emocional à qual o feedback está vinculado.
         /// </summary>
-        public required EmotionSession EmotionSession { get; set; }
+        public EmotionSession? EmotionSession { get; set; }
 
         /// <summary>
         /// Origem do feedback (IA, Gestor ou RH).
