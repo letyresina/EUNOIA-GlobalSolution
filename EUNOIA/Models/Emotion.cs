@@ -16,9 +16,14 @@ namespace EUNOIA.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmotionId { get; set; }
 
-        // Chave estrangeira para EmotionSession
+        /// <summary>
+        /// Chave estrangeira para a sessão de emoção associada.
+        /// </summary>
         [ForeignKey("EmotionSession")]
         public int SessionId { get; set; }
+        /// <summary>
+        /// Sessão de emoção associada a esta emoção.
+        /// </summary>
         public required EmotionSession EmotionSession { get; set; }
 
         /// <summary>

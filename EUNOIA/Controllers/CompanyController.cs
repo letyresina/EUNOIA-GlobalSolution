@@ -4,17 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pelas operações relacionadas à entidade Empresa.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class CompanyController : ControllerBase
+    public class CompanyController(CompanyService service) : ControllerBase
     {
-        private readonly CompanyService _service;
+        private readonly CompanyService _service = service;
 
-        public CompanyController(CompanyService service)
-        {
-            _service = service;
-        }
+        /// <summary>
+        /// Inicializa uma nova instância de <see cref="CompanyController"/>.
+        /// </summary>
+        /// <param name="service">Serviço de empresas.</param>
+        // O construtor primário já está sendo utilizado acima.
 
         /// <summary>
         /// Retorna todas as empresas cadastradas.

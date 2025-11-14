@@ -24,7 +24,7 @@ namespace EUNOIA.Models
         /// <summary>
         /// Usuário relacionado ao log.
         /// </summary>
-        public required User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Tipo de ação realizada na API.

@@ -5,11 +5,25 @@
     /// </summary>
     public enum DeviceType
     {
+        /// <summary>
+        /// Dispositivo desktop (computador de mesa).
+        /// </summary>
         Desktop = 1,
-        Laptop = 2,
-        Tablet = 3,
-        Smartphone = 4
 
+        /// <summary>
+        /// Dispositivo laptop (notebook).
+        /// </summary>
+        Laptop = 2,
+
+        /// <summary>
+        /// Dispositivo tablet.
+        /// </summary>
+        Tablet = 3,
+
+        /// <summary>
+        /// Dispositivo smartphone (celular).
+        /// </summary>
+        Smartphone = 4
     }
 }
 
