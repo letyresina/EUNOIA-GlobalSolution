@@ -1,24 +1,22 @@
 # 🧠 Eunoia
+
 “<i>Eunoia</i>” é uma palavra grega que significa “bela mente” — usada para expressar o estado de equilíbrio entre razão, emoção e bem-estar.
 
 ## 👥 Integrantes
 
 Os responsáveis por esse projeto são:
 
-
-| Nome     | RM     |
-|----------|--------|
-| João Antonio Rihan | 99656  |
+| Nome                             | RM     |
+| -------------------------------- | ------ |
+| João Antonio Rihan               | 99656  |
 | Leticia Cristina Gandarez Resina | 98069  |
-| Rodrigo Fernandes Serafim | 550816 |
+| Rodrigo Fernandes Serafim        | 550816 |
 
 ## 🌱 Conceito
 
 EUNOIA é uma plataforma de IA emocional e cognitiva voltada para empresas que desejam construir ambientes de trabalho mais humanos, equilibrados e produtivos.
 
-
 Ela combina análise de comportamento digital, biometria leve, machine learning emocional e feedbacks empáticos para promover o bem-estar e a empatia organizacional.
-
 
 A meta é simples, mas poderosa: ajudar pessoas e empresas a pensarem, sentirem e trabalharem melhor.
 
@@ -40,9 +38,9 @@ A meta é simples, mas poderosa: ajudar pessoas e empresas a pensarem, sentirem 
 
 ## ⚙️ Sobre a API
 
-**Versão atual:** `v1`
+**Versão atual:** `v2`
 
-O objetivo da API é armazenar informações sobre os usuários, as empresas que os usuários trabalham, emoções, feedbacks e até questões de privacidade como se permite o uso do reconhecimento de imagem ou não. 
+O objetivo da API é armazenar informações sobre os usuários, as empresas que os usuários trabalham, emoções, feedbacks e até questões de privacidade como se permite o uso do reconhecimento de imagem ou não.
 
 Esses dados são processados anonimamente e localmente antes de serem agregados em um painel seguro.
 
@@ -143,11 +141,11 @@ EUNOIA/
 ## 🚀 Como Rodar o Projeto
 
 ### 📥 1. Clonar o Repositório
+
 ```text
 git clone https://github.com/letyresina/EUNOIA-GlobalSolution
 cd EUNOIA
 ```
-
 
 ### 🛠️ 2. Configurar o Banco de Dados (SQL Server)
 
@@ -173,11 +171,13 @@ Localize a seção:
   "EunoiaConnection": "Server=localhost,1433;Database=EunoiaDB;User Id=sa;Password=SUA_SENHA;TrustServerCertificate=True;"
 }
 ```
+
 #### 🔧 Ajuste conforme o ambiente do usuário:
 
 - Se for SQLServer Local normal ou docker, pode manter o server igual
 
 - Se for SQL express, altere server para:
+
 ```text
 Server=localhost\\SQLEXPRESS;
 ```

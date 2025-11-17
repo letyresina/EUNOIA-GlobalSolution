@@ -11,6 +11,7 @@ namespace EUNOIA.Controllers
     /// Controller responsável pela autenticação e geração de tokens.
     /// </summary>
     [ApiController]
+    [ApiVersion("2.0")]
     [AllowAnonymous]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class AuthController : ControllerBase

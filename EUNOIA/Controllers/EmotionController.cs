@@ -10,7 +10,7 @@ namespace EUNOIA.Controllers
     /// </summary>
     [ApiController]
     [Authorize]
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class EmotionController : ControllerBase
