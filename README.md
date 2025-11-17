@@ -139,6 +139,13 @@ EUNOIA/
 └── EUNOIA.http                 → Arquivo para testes de requisições
 ```
 
+##  Diagrama de Classes
+
+Abaixo, está o diagrama de classes do projeto, feito em UML
+
+![eunoia-uml.png](EUNOIA/img/eunoia-uml.png)
+<br>
+
 ## 🚀 Como Rodar o Projeto
 
 ### 📥 1. Clonar o Repositório
