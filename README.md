@@ -40,6 +40,8 @@ A meta é simples, mas poderosa: ajudar pessoas e empresas a pensarem, sentirem 
 
 ## ⚙️ Sobre a API
 
+**Versão atual:** `v1`
+
 O objetivo da API é armazenar informações sobre os usuários, as empresas que os usuários trabalham, emoções, feedbacks e até questões de privacidade como se permite o uso do reconhecimento de imagem ou não. 
 
 Esses dados são processados anonimamente e localmente antes de serem agregados em um painel seguro.
