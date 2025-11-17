@@ -59,7 +59,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore EUNOIA/EUNOIA.csproj
 
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
@@ -71,8 +71,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk auth "$SNYK_TOKEN"
 
+      # Aqui você pode escolher entre apontar direto para o csproj
       - name: Run Snyk test
-        run: snyk test --json > snyk-report.json || true
+        run: snyk test --file=EUNOIA/EUNOIA.csproj --severity-threshold=high --json > snyk-report.json || true
 
       - name: Upload SCA Report
         uses: actions/upload-artifact@v4
