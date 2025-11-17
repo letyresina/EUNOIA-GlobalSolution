@@ -97,6 +97,7 @@ EUNOIA/
 │   ├── DeviceType.cs
 │   ├── FeedbackSource.cs
 │   ├── PrimaryEmotion.cs
+│   ├── ProcessedByType.cs
 │   ├── SecondaryEmotions.cs
 │   └── SuggestedAction.cs
 │
@@ -137,6 +138,13 @@ EUNOIA/
 ├── Program.cs                  → Ponto de entrada da API
 └── EUNOIA.http                 → Arquivo para testes de requisições
 ```
+
+##  Diagrama de Classes
+
+Abaixo, está o diagrama de classes do projeto, feito em UML
+
+![eunoia-uml.png](EUNOIA/img/eunoia-uml.png)
+<br>
 
 ## 🚀 Como Rodar o Projeto
 
@@ -186,10 +194,17 @@ Server=localhost\\SQLEXPRESS;
 
 ### 🗄️ 4. Aplicar as Migrations
 
-Com o banco configurado, rode:
+Com o banco configurado, instale a ferramenta do Entity Framework (se ainda não tiver):
 
 ```text
 dotnet tool install --global dotnet-ef
+```
+
+Em seguida, navegue até a pasta do projeto e aplique as migrations:
+
+```
+cd EUNOIA
+dotnet ef database update
 ```
 
 ### ▶️ 5. Rodar a Aplicação
@@ -207,11 +222,13 @@ Ou rode pelo Visual Studio.
 O Swagger estará disponível em:
 
 ```text
-https://localhost:7072/swagger
+https://localhost:7297/swagger
 ```
 
 ou
 
 ```text
-http://localhost:5072/swagger
+http://localhost:5189/swagger
 ```
+
+> **Nota:** As portas podem variar dependendo da configuração do seu ambiente. Verifique o console ao executar `dotnet run` para ver as portas exatas.
