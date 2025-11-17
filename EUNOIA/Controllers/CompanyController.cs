@@ -58,7 +58,7 @@ namespace EUNOIA.Controllers
         [HttpGet("by-cnpj/{cnpj}")]
         [ProducesResponseType(typeof(CompanyDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CompanyDto>> GetByCNPJ(string cnpj)
+        public async Task<ActionResult<CompanyDto>> GetByCNPJ([FromQuery] string cnpj)
         {
             var company = await _service.GetByCNPJAsync(cnpj);
             if (company == null) return NotFound();
