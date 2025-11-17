@@ -1,14 +1,55 @@
+ï»¿using EUNOIA.Configuration;
 using EUNOIA.Data;
 using EUNOIA.Repositories;
 using EUNOIA.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer; 
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+using Microsoft.OpenApi.Models;
+
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adiciona suporte ao versionamento de API
+// =======================================
+// JWT Settings
+// =======================================
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
+builder.Services.AddScoped<TokenService>();
+
+// =======================================
+// API Versioning
+// =======================================
 builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true;
@@ -16,48 +57,75 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 
-// Adiciona suporte ao versionamento no Swagger
 builder.Services.AddVersionedApiExplorer(options =>
 {
-    options.GroupNameFormat = "'v'VVV"; 
+    options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
 
-builder.Services.AddSwaggerGen();
-builder.Services.ConfigureOptions<EUNOIA.Configuration.ConfigureSwaggerOptions>();
+// =======================================
+// Swagger (modelo novo .NET 10)
+// =======================================
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Digite: Bearer {seu token}"
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                In = ParameterLocation.Header
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
-// Conexão com o SQL Server
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+builder.Services.AddEndpointsApiExplorer();
+
+// =======================================
+// Database
+// =======================================
 builder.Services.AddDbContext<EunoiaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EunoiaConnection")));
 
-// Injeção de dependência para Company
+// =======================================
+// Dependency Injection
+// =======================================
 builder.Services.AddScoped<CompanyRepository>();
 builder.Services.AddScoped<CompanyService>();
 
-// Injeção de dependência para User
-builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserService>();
 
-// Injeção de dependência para PrivacySetting
 builder.Services.AddScoped<PrivacySettingRepository>();
 builder.Services.AddScoped<PrivacySettingService>();
 
-
-// Controllers + Configuração para enums como texto
+// =======================================
+// Controllers + Enums como string
+// =======================================
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-// Swagger (documentação)
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
-// Pipeline HTTP
+// =======================================
+// Pipeline
+// =======================================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -68,14 +136,17 @@ if (app.Environment.IsDevelopment())
     {
         foreach (var description in provider.ApiVersionDescriptions)
         {
-            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"EUNOIA API {description.GroupName.ToUpperInvariant()}");
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"EUNOIA API {description.GroupName.ToUpperInvariant()}"
+            );
         }
     });
 }
 
-
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

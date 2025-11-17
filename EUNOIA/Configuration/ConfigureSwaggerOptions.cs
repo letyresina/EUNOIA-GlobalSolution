@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models; // <-- IMPORTANTE
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EUNOIA.Configuration
@@ -15,16 +15,14 @@ namespace EUNOIA.Configuration
         /// <summary>
         /// Inicializa uma nova instância de <see cref="ConfigureSwaggerOptions"/>.
         /// </summary>
-        /// <param name="provider">Provedor de descrições de versão da API.</param>
         public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
         {
             _provider = provider;
         }
 
-        /// <summary>
+        /// <summary> 
         /// Configura o Swagger para gerar documentação para cada versão da API.
         /// </summary>
-        /// <param name="options">Opções de configuração do Swagger.</param>
         public void Configure(SwaggerGenOptions options)
         {
             foreach (var description in _provider.ApiVersionDescriptions)
@@ -32,7 +30,8 @@ namespace EUNOIA.Configuration
                 options.SwaggerDoc(description.GroupName, new OpenApiInfo
                 {
                     Title = $"EUNOIA API {description.ApiVersion}",
-                    Version = description.ApiVersion.ToString()
+                    Version = description.ApiVersion.ToString(),
+                    Description = "Documentação da API com suporte a versionamento"
                 });
             }
         }
