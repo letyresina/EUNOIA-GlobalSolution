@@ -97,6 +97,7 @@ EUNOIA/
 │   ├── DeviceType.cs
 │   ├── FeedbackSource.cs
 │   ├── PrimaryEmotion.cs
+│   ├── ProcessedByType.cs
 │   ├── SecondaryEmotions.cs
 │   └── SuggestedAction.cs
 │
