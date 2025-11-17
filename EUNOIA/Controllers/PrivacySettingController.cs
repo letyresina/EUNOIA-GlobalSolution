@@ -1,9 +1,11 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [ApiVersion("1.0")]
+[Authorize]
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class PrivacySettingController : ControllerBase

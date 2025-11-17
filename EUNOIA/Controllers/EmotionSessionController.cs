@@ -1,5 +1,6 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
@@ -9,6 +10,7 @@ namespace EUNOIA.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
+    [Authorize]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class EmotionSessionController : ControllerBase

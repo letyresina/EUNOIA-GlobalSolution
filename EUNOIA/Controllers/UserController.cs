@@ -1,5 +1,6 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
@@ -8,6 +9,7 @@ namespace EUNOIA.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
+    [Authorize]
     /// <summary>
     /// Controlador responsável por gerenciar operações relacionadas a usuários.
     /// </summary>
@@ -45,6 +47,7 @@ namespace EUNOIA.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         /// <summary>

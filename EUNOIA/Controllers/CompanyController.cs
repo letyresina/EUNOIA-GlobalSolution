@@ -1,5 +1,6 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
@@ -8,6 +9,7 @@ namespace EUNOIA.Controllers
     /// Controlador responsável pelas operações relacionadas à entidade Empresa.
     /// </summary>
     [ApiController]
+    [Authorize]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
@@ -69,6 +71,7 @@ namespace EUNOIA.Controllers
         /// <param name="dto">Dados da empresa</param>
         /// <returns>Localização do recurso criado</returns>
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateCompanyDto dto)

@@ -2,6 +2,7 @@
 using EUNOIA.Repositories;
 using EUNOIA.Security;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
@@ -10,6 +11,7 @@ namespace EUNOIA.Controllers
     /// Controller responsável pela autenticação e geração de tokens.
     /// </summary>
     [ApiController]
+    [AllowAnonymous]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class AuthController : ControllerBase
     {

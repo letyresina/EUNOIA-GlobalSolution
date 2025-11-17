@@ -1,5 +1,6 @@
 ﻿using EUNOIA.DTOs;
 using EUNOIA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EUNOIA.Controllers
@@ -8,6 +9,7 @@ namespace EUNOIA.Controllers
     /// Controller responsável pelos endpoints de emoções detectadas.
     /// </summary>
     [ApiController]
+    [Authorize]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
