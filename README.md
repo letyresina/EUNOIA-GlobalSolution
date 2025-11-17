@@ -207,11 +207,13 @@ Ou rode pelo Visual Studio.
 O Swagger estará disponível em:
 
 ```text
-https://localhost:7072/swagger
+https://localhost:7297/swagger
 ```
 
 ou
 
 ```text
-http://localhost:5072/swagger
+http://localhost:5189/swagger
 ```
+
+> **Nota:** As portas podem variar dependendo da configuração do seu ambiente. Verifique o console ao executar `dotnet run` para ver as portas exatas.
