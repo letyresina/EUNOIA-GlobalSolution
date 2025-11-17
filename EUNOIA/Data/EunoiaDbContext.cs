@@ -94,6 +94,16 @@ namespace EUNOIA.Data
             modelBuilder.Entity<PrivacySetting>()
                 .HasIndex(p => p.UserId)
                 .IsUnique();
+
+            // 🔒 CPF deve ser único
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.CPF)
+                .IsUnique();
+
+            // 🔒 CNPJ deve ser único
+            modelBuilder.Entity<Company>()
+                .HasIndex(c => c.CNPJ)
+                .IsUnique();
         }
     }
 }

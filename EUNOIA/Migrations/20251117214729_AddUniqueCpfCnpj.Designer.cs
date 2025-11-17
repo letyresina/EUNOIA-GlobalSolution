@@ -4,6 +4,7 @@ using EUNOIA.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EUNOIA.Migrations
 {
     [DbContext(typeof(EunoiaDbContext))]
-    partial class EunoiaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251117214729_AddUniqueCpfCnpj")]
+    partial class AddUniqueCpfCnpj
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
