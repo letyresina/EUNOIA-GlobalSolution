@@ -186,10 +186,17 @@ Server=localhost\\SQLEXPRESS;
 
 ### 🗄️ 4. Aplicar as Migrations
 
-Com o banco configurado, rode:
+Com o banco configurado, instale a ferramenta do Entity Framework (se ainda não tiver):
 
 ```text
 dotnet tool install --global dotnet-ef
+```
+
+Em seguida, navegue até a pasta do projeto e aplique as migrations:
+
+```
+cd EUNOIA
+dotnet ef database update
 ```
 
 ### ▶️ 5. Rodar a Aplicação
