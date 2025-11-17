@@ -97,13 +97,13 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore EUNOIA/EUNOIA.csproj
 
       - name: Build application
-        run: dotnet build --configuration Release
+        run: dotnet build EUNOIA/EUNOIA.csproj --configuration Release
 
       - name: Publish app for testing
-        run: dotnet publish -c Release -o ./out
+        run: dotnet publish EUNOIA/EUNOIA.csproj -c Release -o ./out
 
       - name: Start API in background
         run: |
@@ -113,6 +113,7 @@ jobs:
             echo "Waiting for API to start..."
             sleep 5
           done
+          curl -I http://localhost:8080 || true
 
       - name: Install ZAP 2.16.1
         run: |
@@ -128,7 +129,12 @@ jobs:
 
       - name: Run ZAP Baseline Scan
         run: |
-          ./ZAP_2.16.1/zap.sh -cmd -port 8090 -quickurl http://localhost:8080 -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
+          ./ZAP_2.16.1/zap.sh -cmd -port 8090 -quickurl http://localhost:8080 \
+            -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
+
+      # Passo extra para verificar se o relatório foi realmente criado
+      - name: Check ZAP report exists
+        run: ls -l ZAP_2.16.1/zap-reports || true
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
