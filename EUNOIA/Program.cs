@@ -115,6 +115,19 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PrivacySettingRepository>();
 builder.Services.AddScoped<PrivacySettingService>();
 
+builder.Services.AddScoped<AuditLogRepository>();
+builder.Services.AddScoped<AuditLogService>();
+
+builder.Services.AddScoped<EmotionRepository>();
+builder.Services.AddScoped<EmotionService>();
+
+builder.Services.AddScoped<EmotionSessionRepository>();
+builder.Services.AddScoped<EmotionSessionService>();
+
+
+builder.Services.AddScoped<FeedbackRepository>();
+builder.Services.AddScoped<FeedbackService>();
+
 // =======================================
 // Controllers + Enums como string
 // =======================================
