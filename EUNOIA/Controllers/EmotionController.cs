@@ -9,7 +9,7 @@ namespace EUNOIA.Controllers
     /// Controller responsável pelos endpoints de emoções detectadas.
     /// </summary>
     [ApiController]
-    [Authorize]
+    [Authorize] 
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
@@ -31,7 +31,9 @@ namespace EUNOIA.Controllers
         /// </summary>
         /// <returns>Lista de <see cref="EmotionDto"/> contendo os dados das emoções detectadas.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(List<EmotionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<EmotionDto>), StatusCodes.Status200OK)]   // sucesso
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]                  // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                     // token sem permissão
         public async Task<ActionResult<List<EmotionDto>>> GetAll()
         {
             var emotions = await _service.GetAllAsync();
@@ -44,10 +46,16 @@ namespace EUNOIA.Controllers
         /// <param name="sessionId">Identificador da sessão de emoção.</param>
         /// <returns>Lista de <see cref="EmotionDto"/> associadas à sessão informada.</returns>
         [HttpGet("session/{sessionId}")]
-        [ProducesResponseType(typeof(List<EmotionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<EmotionDto>), StatusCodes.Status200OK)]   // sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                       // sessão não encontrada
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]                   // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                      // token sem permissão
         public async Task<ActionResult<List<EmotionDto>>> GetBySessionId(int sessionId)
         {
             var emotions = await _service.GetBySessionIdAsync(sessionId);
+            if (emotions == null || !emotions.Any())
+                return NotFound();
+
             return Ok(emotions);
         }
 
@@ -57,9 +65,15 @@ namespace EUNOIA.Controllers
         /// <param name="dto">Objeto <see cref="CreateEmotionDto"/> contendo os dados da emoção a ser registrada.</param>
         /// <returns>Resposta HTTP 201 Created.</returns>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created)]                        // criado com sucesso
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]                     // dados inválidos
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]                   // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                      // token sem permissão
         public async Task<IActionResult> Create([FromBody] CreateEmotionDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _service.AddAsync(dto);
             return Created(string.Empty, null);
         }

@@ -9,7 +9,7 @@ namespace EUNOIA.Controllers
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
-    [Authorize]
+    [Authorize] // ✅ exige autenticação JWT para todos os endpoints, exceto os marcados com [AllowAnonymous]
     /// <summary>
     /// Controlador responsável por gerenciar operações relacionadas a usuários.
     /// </summary>
@@ -23,22 +23,27 @@ namespace EUNOIA.Controllers
         /// <param name="service">Serviço responsável pelas operações de usuário.</param>
         public UserController(UserService service) => _service = service;
 
+        /// <summary>
+        /// Retorna todos os usuários cadastrados.
+        /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]   // sucesso
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]               // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                  // token sem permissão
         public async Task<ActionResult<List<UserDto>>> GetAll()
         {
             var users = await _service.GetAllAsync();
             return Ok(users);
         }
 
-        [HttpGet("{cpf}")]
-        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         /// <summary>
         /// Retorna os dados do usuário correspondente ao CPF informado.
         /// </summary>
-        /// <param name="cpf">CPF do usuário a ser consultado.</param>
-        /// <returns>Os dados do usuário, caso encontrado; caso contrário, NotFound.</returns>
+        [HttpGet("{cpf}")]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                   // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]               // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                  // token sem permissão
         public async Task<ActionResult<UserDto>> GetByCPF(string cpf)
         {
             var user = await _service.GetByCPFAsync(cpf);
@@ -46,45 +51,49 @@ namespace EUNOIA.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         /// <summary>
         /// Cria um novo usuário com os dados fornecidos.
         /// </summary>
-        /// <param name="dto">Objeto contendo os dados do usuário a ser criado.</param>
-        /// <returns>Retorna 201 Created se o usuário for criado com sucesso, ou 400 Bad Request em caso de erro.</returns>
+        [HttpPost]
+        [AllowAnonymous] // ✅ cadastro de usuário não exige token
+        [ProducesResponseType(StatusCodes.Status201Created)]                    // criado com sucesso
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]                 // dados inválidos
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]        // erro inesperado
         public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _service.AddAsync(dto);
             return CreatedAtAction(nameof(GetByCPF), new { cpf = dto.CPF }, null);
         }
 
-        [HttpPut("{cpf}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         /// <summary>
         /// Atualiza os dados de um usuário existente identificado pelo CPF.
         /// </summary>
-        /// <param name="cpf">CPF do usuário a ser atualizado.</param>
-        /// <param name="dto">Objeto contendo os novos dados do usuário.</param>
-        /// <returns>Retorna 204 No Content se a atualização for bem-sucedida, 404 Not Found se o usuário não for encontrado, ou 400 Bad Request em caso de erro.</returns>
+        [HttpPut("{cpf}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]                  // atualizado com sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                   // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]                 // dados inválidos
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]               // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                  // token sem permissão
         public async Task<IActionResult> Update(string cpf, [FromBody] CreateUserDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _service.UpdateByCPFAsync(cpf, dto);
             return NoContent();
         }
 
-        [HttpDelete("{cpf}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         /// <summary>
         /// Remove um usuário identificado pelo CPF.
         /// </summary>
-        /// <param name="cpf">CPF do usuário a ser removido.</param>
-        /// <returns>Retorna 204 No Content se a exclusão for bem-sucedida, ou 404 Not Found se o usuário não for encontrado.</returns>
+        [HttpDelete("{cpf}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]                  // removido com sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                   // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]               // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                  // token sem permissão
         public async Task<IActionResult> Delete(string cpf)
         {
             await _service.DeleteByCPFAsync(cpf);
@@ -95,8 +104,10 @@ namespace EUNOIA.Controllers
         /// Retorna os dados do usuário junto com a empresa vinculada.
         /// </summary>
         [HttpGet("{cpf}/with-company")]
-        [ProducesResponseType(typeof(UserWithCompanyDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UserWithCompanyDto), StatusCodes.Status200OK)] // sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                       // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]                   // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                      // token sem permissão
         public async Task<ActionResult<UserWithCompanyDto>> GetByCPFWithCompany(string cpf)
         {
             var user = await _service.GetByCPFWithCompanyAsync(cpf);
@@ -105,27 +116,13 @@ namespace EUNOIA.Controllers
         }
 
         /// <summary>
-        /// Autentica um usuário pelo CPF e senha.
-        /// </summary>
-        [HttpPost("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
-        {
-            var isAuthenticated = await _service.AuthenticateAsync(dto);
-            if (!isAuthenticated) return Unauthorized("CPF ou senha inválidos.");
-
-            return Ok("Login realizado com sucesso.");
-        }
-
-        /// <summary>
         /// Retorna os dados do usuário juntamente com as configurações de privacidade vinculadas ao CPF informado.
         /// </summary>
-        /// <param name="cpf">CPF do usuário a ser consultado.</param>
-        /// <returns>Os dados do usuário com configurações de privacidade, caso encontrado; caso contrário, NotFound.</returns>
         [HttpGet("{cpf}/with-privacy-setting")]
-        [ProducesResponseType(typeof(UserWithPrivacySettingDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UserWithPrivacySettingDto), StatusCodes.Status200OK)] // sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)]                              // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]                          // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]                             // token sem permissão
         public async Task<ActionResult<UserWithPrivacySettingDto>> GetByCPFWithPrivacySetting(string cpf)
         {
             var user = await _service.GetByCPFWithPrivacySettingAsync(cpf);
@@ -133,5 +130,4 @@ namespace EUNOIA.Controllers
             return Ok(user);
         }
     }
-
 }

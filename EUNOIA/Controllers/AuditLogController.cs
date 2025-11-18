@@ -9,7 +9,7 @@ namespace EUNOIA.Controllers
     /// Controller responsável pelos endpoints de logs de auditoria.
     /// </summary>
     [ApiController]
-    [Authorize]
+    [Authorize] 
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
@@ -32,6 +32,8 @@ namespace EUNOIA.Controllers
         /// <returns>Lista de <see cref="AuditLogDto"/>.</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<AuditLogDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]    // token sem permissão
         public async Task<ActionResult<List<AuditLogDto>>> GetAll()
         {
             var logs = await _service.GetAllAsync();
@@ -45,9 +47,15 @@ namespace EUNOIA.Controllers
         /// <returns>Lista de <see cref="AuditLogDto"/> relacionados ao usuário.</returns>
         [HttpGet("user/{userId}")]
         [ProducesResponseType(typeof(List<AuditLogDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]     // usuário não encontrado
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]    // token sem permissão
         public async Task<ActionResult<List<AuditLogDto>>> GetByUserId(int userId)
         {
             var logs = await _service.GetByUserIdAsync(userId);
+            if (logs == null || !logs.Any())
+                return NotFound();
+
             return Ok(logs);
         }
 
@@ -58,8 +66,14 @@ namespace EUNOIA.Controllers
         /// <returns>Resposta HTTP 201 Created.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]   // dados inválidos
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)] // sem token válido
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]    // token sem permissão
         public async Task<IActionResult> Create([FromBody] CreateAuditLogDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _service.AddAsync(dto);
             return Created(string.Empty, null);
         }

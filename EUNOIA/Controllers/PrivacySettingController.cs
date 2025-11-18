@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Authorize]
+[Authorize] 
 [Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 public class PrivacySettingController : ControllerBase
@@ -21,6 +21,9 @@ public class PrivacySettingController : ControllerBase
     /// Obtém todas as configurações de privacidade.
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<PrivacySettingDto>), StatusCodes.Status200OK)]   // sucesso
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]                         // sem token válido
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]                            // token sem permissão
     public async Task<ActionResult<List<PrivacySettingDto>>> GetAll()
     {
         var settings = await _service.GetAllAsync();
@@ -31,6 +34,10 @@ public class PrivacySettingController : ControllerBase
     /// Obtém a configuração de privacidade de um usuário.
     /// </summary>
     [HttpGet("{userId}")]
+    [ProducesResponseType(typeof(PrivacySettingWithUserDto), StatusCodes.Status200OK)] // sucesso
+    [ProducesResponseType(StatusCodes.Status404NotFound)]                              // usuário não encontrado
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]                          // sem token válido
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]                             // token sem permissão
     public async Task<ActionResult<PrivacySettingWithUserDto>> GetByUserIdWithUser(int userId)
     {
         var setting = await _service.GetByUserIdWithUserAsync(userId);
@@ -42,8 +49,15 @@ public class PrivacySettingController : ControllerBase
     /// Cria uma nova configuração de privacidade.
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]                               // criado com sucesso
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]                            // dados inválidos
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]                          // sem token válido
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]                             // token sem permissão
     public async Task<IActionResult> Create([FromBody] CreatePrivacySettingDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         await _service.AddAsync(dto);
         return CreatedAtAction(nameof(GetByUserIdWithUser), new { userId = dto.UserId }, null);
     }
@@ -52,8 +66,16 @@ public class PrivacySettingController : ControllerBase
     /// Atualiza a configuração de privacidade.
     /// </summary>
     [HttpPut("{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]                             // atualizado com sucesso
+    [ProducesResponseType(StatusCodes.Status404NotFound)]                              // usuário não encontrado
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]                            // dados inválidos
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]                          // sem token válido
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]                             // token sem permissão
     public async Task<IActionResult> Update(int userId, [FromBody] CreatePrivacySettingDto dto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         await _service.UpdateAsync(userId, dto);
         return NoContent();
     }
@@ -62,6 +84,10 @@ public class PrivacySettingController : ControllerBase
     /// Remove a configuração de privacidade.
     /// </summary>
     [HttpDelete("{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]                             // removido com sucesso
+    [ProducesResponseType(StatusCodes.Status404NotFound)]                              // usuário não encontrado
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]                          // sem token válido
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]                             // token sem permissão
     public async Task<IActionResult> Delete(int userId)
     {
         await _service.DeleteByUserIdAsync(userId);

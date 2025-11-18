@@ -160,19 +160,6 @@ namespace EUNOIA.Services
         }
 
         /// <summary>
-        /// Autentica um usuário com base no CPF e senha fornecidos.
-        /// </summary>
-        /// <param name="dto">DTO contendo CPF e senha.</param>
-        /// <returns>True se a autenticação for bem-sucedida; caso contrário, false.</returns>
-        public async Task<bool> AuthenticateAsync(LoginDto dto)
-        {
-            var user = await _repository.GetByCPFAsync(dto.CPF);
-            if (user == null) return false;
-
-            return PasswordHasher.VerifyPassword(dto.Password, user.PasswordHash);
-        }
-
-        /// <summary>
         /// Obtém um usuário pelo CPF, incluindo suas configurações de privacidade.
         /// </summary>
         /// <param name="cpf">CPF do usuário.</param>
