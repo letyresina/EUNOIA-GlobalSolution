@@ -44,6 +44,10 @@ O objetivo da API é armazenar informações sobre os usuários, as empresas que
 
 Esses dados são processados anonimamente e localmente antes de serem agregados em um painel seguro.
 
+## 🔗 Link de funcionamento
+
+Para mais detalhes da API funcionando, você pode ver nosso vídeo testando aqui: https://youtu.be/pphAXvQ9wEU
+
 ## 📌 Visão geral
 
 O EUNOIA é uma API desenvolvida em .NET 10 com foco em gerenciamento de usuários, emoções, sessões emocionais, empresas parceiras, feedbacks e auditoria.
