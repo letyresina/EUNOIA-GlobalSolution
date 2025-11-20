@@ -11,9 +11,9 @@ on:
     branches: ["main"]
 
 jobs:
-  ######################################################
+  #############################################################
   # 1. SAST - Semgrep
-  ######################################################
+  #############################################################
   sast:
     name: SAST - Semgrep (C#)
     runs-on: ubuntu-latest
@@ -43,9 +43,9 @@ jobs:
         with:
           sarif_file: semgrep.sarif
 
-  ######################################################
+  #############################################################
   # 2. SCA - Snyk
-  ######################################################
+  #############################################################
   sca:
     name: SCA - Snyk (Dependencies)
     runs-on: ubuntu-latest
@@ -71,7 +71,6 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk auth "$SNYK_TOKEN"
 
-      # Aqui você pode escolher entre apontar direto para o csproj
       - name: Run Snyk test
         run: snyk test --file=EUNOIA/EUNOIA.csproj --severity-threshold=high --json > snyk-report.json || true
 
@@ -81,9 +80,9 @@ jobs:
           name: sca-report
           path: snyk-report.json
 
-  ######################################################
+  #############################################################
   # 3. DAST - OWASP ZAP
-  ######################################################
+  #############################################################
   dast:
     name: DAST - OWASP ZAP (API)
     runs-on: ubuntu-latest
@@ -108,12 +107,16 @@ jobs:
       - name: Start API in background
         run: |
           nohup dotnet ./out/EUNOIA.dll --urls "http://localhost:8080" > app.log 2>&1 &
+
+          echo "⏳ Aguardando API iniciar..."
           for i in {1..12}; do
-            nc -z localhost 8080 && break
-            echo "Waiting for API to start..."
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "API iniciada!"
+              break
+            fi
+            echo "API ainda não respondeu... tentando novamente"
             sleep 5
           done
-          curl -I http://localhost:8080 || true
 
       - name: Install ZAP 2.16.1
         run: |
@@ -129,23 +132,23 @@ jobs:
 
       - name: Run ZAP Baseline Scan
         run: |
-          ./ZAP_2.16.1/zap.sh -cmd -port 8090 -quickurl http://localhost:8080 \
-            -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
+          ./ZAP_2.16.1/zap.sh -cmd -port 8090 \
+          -quickurl http://localhost:8080 \
+          -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
 
-      # Passo extra para verificar se o relatório foi realmente criado
-      - name: Check ZAP report exists
-        run: ls -l ZAP_2.16.1/zap-reports || true
+      - name: List ZAP reports
+        run: ls -R ZAP_2.16.1/zap-reports || true
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: dast-report
-          path: ZAP_2.16.1/zap-reports/**
+          path: ZAP_2.16.1/zap-reports
 
-  ######################################################
+  #############################################################
   # 4. Integration & Monitoring
-  ######################################################
+  #############################################################
   integration:
     name: Integration & Monitoring
     runs-on: ubuntu-latest

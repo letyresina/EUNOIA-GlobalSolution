@@ -124,7 +124,6 @@ builder.Services.AddScoped<EmotionService>();
 builder.Services.AddScoped<EmotionSessionRepository>();
 builder.Services.AddScoped<EmotionSessionService>();
 
-
 builder.Services.AddScoped<FeedbackRepository>();
 builder.Services.AddScoped<FeedbackService>();
 
