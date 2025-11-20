@@ -71,8 +71,8 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk auth "$SNYK_TOKEN"
 
-      - name: Run Snyk test
-        run: snyk test --file=EUNOIA/EUNOIA.csproj --severity-threshold=high --json > snyk-report.json || true
+      - name: Run Snyk test (forced dotnet)
+        run: snyk test --file=EUNOIA/EUNOIA.csproj --package-manager=nuget --severity-threshold=high --json > snyk-report.json || true
 
       - name: Upload SCA Report
         uses: actions/upload-artifact@v4
@@ -118,33 +118,31 @@ jobs:
             sleep 5
           done
 
+          echo "📄 LOG DO APP:"
+          cat app.log || true
+
       - name: Install ZAP 2.16.1
         run: |
           wget https://github.com/zaproxy/zaproxy/releases/download/v2.16.1/ZAP_2.16.1_Linux.tar.gz
           tar -xzf ZAP_2.16.1_Linux.tar.gz
           chmod +x ZAP_2.16.1/zap.sh
 
-      - name: Create writable report directory
-        run: mkdir -p ZAP_2.16.1/zap-reports && chmod -R 777 ZAP_2.16.1/zap-reports
-
-      - name: Update ZAP add-ons
-        run: ./ZAP_2.16.1/zap.sh -cmd -port 8090 -addonupdate
+      - name: Prepare ZAP report folder
+        run: mkdir -p zap-reports
 
       - name: Run ZAP Baseline Scan
         run: |
-          ./ZAP_2.16.1/zap.sh -cmd -port 8090 \
-          -quickurl http://localhost:8080 \
-          -quickout ZAP_2.16.1/zap-reports/zap-report.html || true
+          ./ZAP_2.16.1/zap.sh -cmd -quickurl http://localhost:8080 \
+            -quickout zap-reports/zap-report.html || true
 
-      - name: List ZAP reports
-        run: ls -R ZAP_2.16.1/zap-reports || true
+          echo "📄 Verificando se o relatório existe:"
+          ls -R zap-reports || true
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
-        continue-on-error: true
         with:
           name: dast-report
-          path: ZAP_2.16.1/zap-reports
+          path: zap-reports
 
   #############################################################
   # 4. Integration & Monitoring
